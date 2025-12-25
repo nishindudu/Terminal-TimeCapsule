@@ -78,7 +78,10 @@ def list_timecapsules():
         with open("timecapsules.json", "r") as f:
             capsules = json.load(f)
             for capsule in capsules:
-                print(f"Date: {capsule['open_at']}, Created On: {capsule['created_at']}")
+                if datetime.datetime.now() >= datetime.datetime.strptime(capsule["open_at"], "%Y-%m-%d"):
+                    print(f"\033[32mDate: {capsule['open_at']}, Created On: {capsule['created_at']} (Ready to Open)\033[0m")
+                else:
+                    print(f"Date: {capsule['open_at']}, Created On: {capsule['created_at']}")
     except FileNotFoundError:
         print("No time capsules found.")
     
@@ -108,6 +111,8 @@ def open_timecapsule(date):
             found = True
     if not found:
         print("Time capsule not found.")
+
+
 
 if args.command == "create":
     open_at_date = datetime.datetime.strptime(args.open_at, "%Y-%m-%d")
