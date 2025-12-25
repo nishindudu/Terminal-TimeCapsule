@@ -26,6 +26,9 @@ delete_parser.add_argument("date", type=str, help="Date of the time capsule to d
 
 args = argument_parser.parse_args()
 
+print("\t\tTerminal Timecapsule")
+print("------------------------------------------------------")
+
 
 def encrypt_message(message):
     if not os.path.exists("capsule_keys.key"):
@@ -136,7 +139,7 @@ def delete_timecapsule(date):
             capsules.remove(to_delete)
     else:
         capsules = [c for c in capsules if c['open_at'] != date.strftime("%Y-%m-%d")]
-        
+
     with open("timecapsules.json", "w") as f:
         json.dump(capsules, f, indent=4)
 
