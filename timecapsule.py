@@ -21,6 +21,9 @@ show_parser.add_argument("date", type=str, help="Date of the time capsule to sho
 open_parser = subparsers.add_parser("open", help="Open the time capsule if the date has passed.")
 open_parser.add_argument("date", type=str, help="Date of the time capsule to open (YYYY-MM-DD).")
 
+delete_parser = subparsers.add_parser("delete", help="Delete a specific time capsule by date.")
+delete_parser.add_argument("date", type=str, help="Date of the time capsule to delete (YYYY-MM-DD).")
+
 args = argument_parser.parse_args()
 
 
@@ -112,6 +115,31 @@ def open_timecapsule(date):
     if not found:
         print("Time capsule not found.")
 
+def delete_timecapsule(date):
+    capsules = load_timecapsules()
+    capsules_on_date = [c for c in capsules if c['open_at'] == date.strftime("%Y-%m-%d")]
+
+    if not capsules_on_date:
+        print("Time capsule not found.")
+        return
+    
+    if len(capsules_on_date) > 1:
+        print("Multiple time capsules found for this date. Specify which one to delete.")
+        for i in capsules_on_date:
+            print(f"Created On: {i['created_at']}, Open At: {i['open_at']}")
+            print("----------------------------------------------------------")
+        choice = int(input("Enter the number of the time capsule to delete or 0 for all:"))
+        if choice == 0:
+            capsules = [c for c in capsules if c['open_at'] != date.strftime("%Y-%m-%d")]
+        else:
+            to_delete = capsules_on_date[choice - 1]
+            capsules.remove(to_delete)
+    else:
+        capsules = [c for c in capsules if c['open_at'] != date.strftime("%Y-%m-%d")]
+        
+    with open("timecapsules.json", "w") as f:
+        json.dump(capsules, f, indent=4)
+
 
 
 if args.command == "create":
@@ -126,3 +154,6 @@ elif args.command == "show":
 elif args.command == "open":
     date = datetime.datetime.strptime(args.date, "%Y-%m-%d")
     open_timecapsule(date)
+elif args.command == "delete":
+    date = datetime.datetime.strptime(args.date, "%Y-%m-%d")
+    delete_timecapsule(date)
